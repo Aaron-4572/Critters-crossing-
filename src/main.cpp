@@ -38,8 +38,19 @@ int main()
     while (window.pollEvent(event))
     {
       // "close requested" event: we close the window
-      if (event.type == sf::Event::Closed)
-        window.close();
+        if (event.type == sf::Event::Closed)
+        {
+            window.close();
+        }
+        
+        if (event.type == sf::Event::KeyPressed)
+        {
+            game.keyPressed(event);
+        }
+        if (event.type == sf::Event::MouseButtonPressed)
+        {
+            game.mouseClicked(event);
+        }
     }
 
 

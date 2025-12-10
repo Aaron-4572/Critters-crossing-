@@ -2,17 +2,49 @@
 #include "Game.h"
 #include <iostream>
 #include <ctime>
+#include <cstdlib>
 
 Game::Game(sf::RenderWindow& game_window)
-  : window(game_window)
-  , current_state(GameState::MENU)
+  : current_state(GameState::MENU)
+  , window(game_window)
+  
 
 {
-  srand(static_cast<unsigned int>(std::time(nullptr)));
+  std::srand(static_cast<unsigned int>(std::time(nullptr)));
+
+  animal_sprite = nullptr;
+  closed_passport_sprite = nullptr;
+  open_passport_sprite = nullptr;
+  passport_photo_sprite = nullptr;
+  dragged_sprite = nullptr;
+
+  dragging = false;
+  passport_open = false;
+
+  current_animal_index = 0;
+  current_passport_index = 0;
+
+  should_accept = false;
+
+  inspection_zone_x = window.getSize().x * 0.55f;
+
+  closed_passport_home_position = sf::Vector2f(window.getSize().x * 0.45f, window.getSize().y * 0.65f);
+
+
 }
 
 Game::~Game()
 {
+	delete animal_sprite;
+	delete closed_passport_sprite;
+	delete open_passport_sprite;
+	delete passport_photo_sprite;
+
+	animal_sprite = nullptr;
+	closed_passport_sprite = nullptr;
+	open_passport_sprite = nullptr;
+	passport_photo_sprite = nullptr;
+
 
 }
 
@@ -37,6 +69,16 @@ bool Game::init()
 	}
 
 	setupMenu();
+
+	if (!loadTextures())
+	{
+		std::cout << "Textures failed to load";
+	}
+
+	createSprites();
+
+	newAnimal();
+
 
 	return true;
 }
@@ -78,6 +120,66 @@ void Game::setupMenu()
 
 
 }
+
+bool Game::loadTextures()
+{
+	bool all_ok = true;
+
+	animal_textures.resize(9);
+
+	auto loadAnimal = [&](int index, const std::string& path)
+		{
+			if (!animal_textures[index].loadFromFile(path))
+			{
+				std::cout << "couldnt load animal textures" <<path << "\n";
+				all_ok = false;
+			}
+		};
+
+
+	//loading animal textures
+	loadAnimal(0, "../Data/Critter_crossing/Animals/walrus.png");
+	loadAnimal(1, "../Data/Critter_crossing/Animals/buffalo.png");
+	loadAnimal(2, "../Data/Critter_crossing/Animals/elephant.png");
+	loadAnimal(3, "../Data/Critter_crossing/Animals/giraffe.png");
+	loadAnimal(4, "../Data/Critter_crossing/Animals/gorilla.png");
+	loadAnimal(5, "../Data/Critter_crossing/Animals/moose.png");
+	loadAnimal(6, "../Data/Critter_crossing/Animals/narwhal.png");
+	loadAnimal(7, "../Data/Critter_crossing/Animals/penguin.png");
+	loadAnimal(8, "../Data/Critter_crossing/Animals/chicken.png");
+
+	    //pasport
+		if (!closed_passport_texture.loadFromFile("..Data/Critter_crossing/Passports/closed_passport.png"))
+		{
+			std::cout << "couldnt load closed passport texture\n";
+			all_ok = false;
+	    }
+
+		if (!open_passport_texture.loadFromFile("..Data/Critter_crossing/Passports/open_passport.png"))
+		{
+			std::cout << "couldnt load open passport texture\n";
+			all_ok = false;
+
+		}
+		return all_ok;
+}
+
+void Game::createSprites()
+{
+	animal_sprite = new sf::Sprite();
+    closed_passport_sprite = new sf::Sprite();
+	open_passport_sprite = new sf::Sprite();
+	closed_passport_sprite = new sf::Sprite();
+
+
+
+
+}
+
+
+
+
+
 
 void Game::update(float dt)
 {

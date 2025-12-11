@@ -283,7 +283,15 @@ void Game::update(float dt)
 	}
 	else if (current_state == GameState::PLAYING)
 	{
-		
+		//Brightens and dims closed passport when hovering
+		if (isMouseOverSprite(*closed_passport_sprite))
+		{
+			closed_passport_sprite->setColor(sf::Color(255, 255, 255, 255));
+		}
+		else
+		{
+			closed_passport_sprite->setColor(sf::Color(200, 200, 200, 200));
+		}
 	}
 	else if (current_state == GameState::EXIT)
 	{
@@ -373,4 +381,11 @@ bool Game::isMouseOverText(const sf::Text& text)
 	return text.getGlobalBounds().contains(mouse_position_f);
 }
 
+bool Game::isMouseOverSprite(const sf::Sprite& sprite)
+{
+	sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
+	sf::Vector2f mouse_pos_f(static_cast<float>(mouse_pos.x), static_cast<float>(mouse_pos.y));
+
+	return sprite.getGlobalBounds().contains(mouse_pos_f);
+}
 

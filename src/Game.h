@@ -48,6 +48,7 @@ class Game
 
   void setupMenu();
   bool isMouseOverText(const sf::Text& text);
+  bool isMouseOverSprite(const sf::Sprite& sprite);
 
 
 

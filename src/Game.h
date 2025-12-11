@@ -34,6 +34,10 @@ class Game
   sf::Texture background_texture;
   sf::Sprite background_sprite;
 
+  //Desk
+  sf::Texture desk_texture;
+  sf::Sprite desk_sprite;
+
   //Font UI
   sf::Font ui_font;
 

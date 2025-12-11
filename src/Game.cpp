@@ -28,7 +28,7 @@ Game::Game(sf::RenderWindow& game_window)
 
   inspection_zone_x = window.getSize().x * 0.55f;
 
-  closed_passport_home_position = sf::Vector2f(window.getSize().x * 0.45f, window.getSize().y * 0.65f);
+  closed_passport_home_position = sf::Vector2f(window.getSize().x * 0.25f, window.getSize().y - desk_sprite.getGlobalBounds().height - 70.f);
 
 
 }
@@ -161,6 +161,12 @@ bool Game::loadTextures()
 			all_ok = false;
 
 		}
+		if (!desk_texture.loadFromFile("../Data/Critter_crossing/UI/Desk.png"))
+		{
+			std::cout << "Desk texture couldnt load\n";
+			all_ok = false;
+		}
+
 		return all_ok;
 }
 
@@ -171,22 +177,23 @@ void Game::createSprites()
 	open_passport_sprite = new sf::Sprite();
 	passport_photo_sprite = new sf::Sprite();
 
-	//assigns textures
+	//closed passport texture
 	closed_passport_sprite->setTexture(closed_passport_texture, true);
-	//set positions 
+
+	//closed passport positions 
 	sf::FloatRect closed_bounds = closed_passport_sprite->getLocalBounds();
 	closed_passport_sprite->setOrigin(closed_bounds.width / 2.0f, closed_bounds.height / 2.0f);
 
 	closed_passport_sprite->setPosition(closed_passport_home_position);
+	closed_passport_sprite->setScale(0.3f, 0.3f);
 
+	//open passport texture
 	open_passport_sprite->setTexture(open_passport_texture, true);
+
+	//open passport position & inspection zone
 	sf::FloatRect open_bounds = open_passport_sprite->getLocalBounds();
     open_passport_sprite->setOrigin(open_bounds.width / 2.0f, open_bounds.height / 2.0f);
-
-	//inspection zone
-	open_passport_sprite->setPosition(
-		window.getSize().x * 0.70f,
-		window.getSize().y * 0.45f);
+	open_passport_sprite->setPosition(window.getSize().x * 0.70f, window.getSize().y * 0.45f);
 
 	sf::FloatRect dummy_animal_bounds = animal_sprite->getLocalBounds();
 	animal_sprite->setOrigin(dummy_animal_bounds.width / 2.0f, dummy_animal_bounds.height / 2.0f);
@@ -195,6 +202,16 @@ void Game::createSprites()
 
 	sf::FloatRect dummy_photo_bounds = closed_passport_sprite->getLocalBounds();
 	passport_photo_sprite->setOrigin(dummy_photo_bounds.width / 2.0f, dummy_photo_bounds.height / 2.0f);
+
+	//Desk setup
+	desk_sprite.setTexture(desk_texture);
+
+	float scale_x = window.getSize().x / desk_sprite.getLocalBounds().width;
+	float scale_y = 0.5f;
+
+	desk_sprite.setScale(scale_x, scale_y);
+
+	desk_sprite.setPosition(0, window.getSize().y - desk_sprite.getGlobalBounds().height);
 
 }
 
@@ -286,8 +303,14 @@ void Game::render()
 	}
 	else if(current_state == GameState::PLAYING)
 	{
+		window.draw(desk_sprite);
+
 		if (animal_sprite)
 			window.draw(*animal_sprite);
+
+		if (closed_passport_sprite)
+			window.draw(*closed_passport_sprite);
+        
 
 	}
 }

@@ -88,10 +88,8 @@ class Game
 
   //For dragging 
   sf::Sprite* dragged_sprite;
-
-  bool dragging;
-
   sf::Vector2f drag_offset;
+  bool dragging = false;
 
   void startDragging(sf::Sprite* sprite, const sf::Vector2f& mouse_pos);
 

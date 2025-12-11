@@ -292,6 +292,15 @@ void Game::update(float dt)
 		{
 			closed_passport_sprite->setColor(sf::Color(200, 200, 200, 200));
 		}
+
+		if (dragging && dragged_sprite)
+		{
+			sf::Vector2i mouse = sf::Mouse::getPosition(window);
+			sf::Vector2f mouse_f(static_cast<float>(mouse.x), static_cast<float>(mouse.y));
+
+			dragged_sprite->setPosition(mouse_f + drag_offset);
+
+		}
 	}
 	else if (current_state == GameState::EXIT)
 	{
@@ -346,7 +355,16 @@ void Game::mouseClicked(sf::Event event)
   }
   else if (current_state == GameState::PLAYING)
   {
+	  if (event.mouseButton.button == sf::Mouse::Left)
+	  {
+		  dragging = true;
+		  dragged_sprite = closed_passport_sprite;
 
+		  sf::Vector2i mouse = sf::Mouse::getPosition(window);
+		  sf::Vector2f mouse_f(static_cast<float>(mouse.x), static_cast<float>(mouse.y));
+
+		  drag_offset = dragged_sprite->getPosition() - mouse_f;
+	  }
   }
 }
 

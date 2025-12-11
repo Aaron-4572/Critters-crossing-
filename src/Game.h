@@ -41,10 +41,19 @@ class Game
   //Font UI
   sf::Font ui_font;
 
-  //All title texts
+
+  //All Menu texts
   sf::Text title_text;
   sf::Text start_text;
   sf::Text quit_text;
+
+  //Score and lives text
+  sf::Text score_text;
+  sf::Text lives_text;
+  sf::Text feedback_text;
+
+  float feedback_timer = 0.0f;
+  bool showing_feedback = false;
 
   void setupMenu();
   bool isMouseOverText(const sf::Text& text);
@@ -86,6 +95,11 @@ class Game
   float stamp_timer = 0.0f;
   bool stamp_is_approved = false;
   float stamp_delay = 0.0f;
+
+  //Scoring & lives
+  int score = 0;
+  int lives = 3;
+
 
   int current_animal_index;
   int current_passport_index;

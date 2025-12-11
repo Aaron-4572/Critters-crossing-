@@ -271,6 +271,30 @@ void Game::createSprites()
 	sf::FloatRect rbounds = denied_stamp_sprite.getLocalBounds();
 	denied_stamp_sprite.setOrigin(rbounds.width / 2.f, rbounds.height / 2.f);
 
+	//Score Text
+	score_text.setFont(ui_font);
+	score_text.setCharacterSize(32);
+	score_text.setFillColor(sf::Color::Yellow);
+	score_text.setString("Score: 0 ");
+	score_text.setPosition(20.0f, 20.f);
+
+	//Lives text
+	lives_text.setFont(ui_font);
+	lives_text.setCharacterSize(32);
+	lives_text.setFillColor(sf::Color::Red);
+	lives_text.setString("Lives: 3");
+	lives_text.setPosition(20.f, 60.f);
+
+	//Feedback text
+	feedback_text.setFont(ui_font);
+	feedback_text.setCharacterSize(40);
+	feedback_text.setFillColor(sf::Color::White);
+	feedback_text.setString("");
+	feedback_text.setPosition(window.getSize().x * 0.32f, window.getSize().y * 0.6f);
+
+	sf::FloatRect fb = feedback_text.getLocalBounds();
+
+	feedback_text.setOrigin(fb.width / 2.f, fb.height / 2.f);
 
 }
 
@@ -443,6 +467,31 @@ void Game::update(float dt)
 				
 			}
 		}
+		if (lives <= 0)
+		{
+			std::cout << "GAME OVER - Returning to Main Menu\n";
+
+			lives = 3;
+		    score = 0;
+			score_text.setString("Score: 0");
+			lives_text.setString("Lives: 3");
+
+			passport_open = false;
+			stamping = false;
+
+			current_state = GameState::MENU;
+				
+			return;
+		}
+		if (showing_feedback)
+		{
+			feedback_timer -= dt;
+
+			if (feedback_timer <= 0)
+			{
+				showing_feedback = false;
+			}
+		}
 	}
 	else if (current_state == GameState::EXIT)
 	{
@@ -507,6 +556,14 @@ void Game::render()
 			}
 		}
 
+		window.draw(score_text);
+		window.draw(lives_text);
+
+		if (showing_feedback)
+		{
+			window.draw(feedback_text);
+		}
+
 		if (stamping)
 		{
 			if (stamp_is_approved)
@@ -569,17 +626,30 @@ void Game::mouseClicked(sf::Event event)
 			  bool correct = passportMatchesAnimal();
 			  if (correct)
 			  {
+				  score++;
+				  feedback_text.setString("Correct!");
+				  feedback_text.setFillColor(sf::Color(0, 255, 0));
+				  
 				  std::cout << "you accepted a real passport\n";
 			  }
 			  else
 			  {
+				  lives--;
+				  feedback_text.setString("Incorrect!");
+				  feedback_text.setFillColor(sf::Color(255, 0, 0));
+				  
 				  std::cout << " you accepted a fake passport\n";
 				  
 			  }
+			  showing_feedback = true;
+			  feedback_timer = 1.2f;
 
 			  stamping = true;
 			  stamp_is_approved = true;
 			  stamp_timer = 0.0f;
+
+			  score_text.setString("Score: " + std::to_string(score));
+			  lives_text.setString("Lives: " + std::to_string(lives));
 
 			  return;
 
@@ -590,18 +660,29 @@ void Game::mouseClicked(sf::Event event)
 
 			  if (correct)
 			  {
+				  score++;
+				  feedback_text.setString("Correct!");
+				  feedback_text.setFillColor(sf::Color(0, 255, 0));
+				  
 				  std::cout << "You rejectd a fake passport\n";
 			  }
 			  else
 			  {
-				  std::cout << " you rejected a real passport\n";
+				  lives--;
+				  feedback_text.setString("Incorrect!");
+				  feedback_text.setFillColor(sf::Color(255, 0, 0));
 				  
-
+				  std::cout << " you rejected a real passport\n";
 			  }
+			  showing_feedback = true;
+			  feedback_timer = 1.2f;
 
 			  stamping = true;
 			  stamp_is_approved = false;
 			  stamp_timer = 0.0f;
+
+			  score_text.setString("Score: " + std::to_string(score));
+			  lives_text.setString("Lives: " + std::to_string(lives));
 
 			  return;
 		  }

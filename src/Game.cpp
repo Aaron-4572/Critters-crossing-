@@ -372,6 +372,20 @@ void Game::mouseReleased(sf::Event event)
 {
 	if (event.mouseButton.button == sf::Mouse::Left)
 	{
+		if (dragging && dragged_sprite == closed_passport_sprite)
+		{
+			if (isInInspectionZone(*closed_passport_sprite))
+			{
+				std::cout << "passport dropped in zone\n";
+			}
+			else
+			{
+				closed_passport_sprite->setPosition(closed_passport_home_position);
+				std::cout << "Dropped outside zone\n";
+			}
+		}
+
+
 		dragging = false;
 		dragged_sprite = nullptr;
 	}
@@ -414,5 +428,18 @@ bool Game::isMouseOverSprite(const sf::Sprite& sprite)
 	sf::Vector2f mouse_pos_f(static_cast<float>(mouse_pos.x), static_cast<float>(mouse_pos.y));
 
 	return sprite.getGlobalBounds().contains(mouse_pos_f);
+}
+
+bool Game::isInInspectionZone(const sf::Sprite& sprite)
+{
+	float zone_x = window.getSize().x * 0.60f;
+	float zone_y = window.getSize().y - 250.f;
+	float zone_w = window.getSize().x * 0.35f;
+	float zone_h = 250.f;
+
+	sf::FloatRect zone(zone_x, zone_y, zone_w, zone_h);
+
+	return zone.intersects(sprite.getGlobalBounds());
+
 }
 

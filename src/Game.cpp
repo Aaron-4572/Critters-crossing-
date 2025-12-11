@@ -166,7 +166,16 @@ bool Game::loadTextures()
 			std::cout << "Desk texture couldnt load\n";
 			all_ok = false;
 		}
+		if (!accept_texture.loadFromFile("../Data/Critter_crossing/UI/accept_button.png"))
+		{
+			std::cout << "Couldnt load accept button\n";
 
+		}
+		if (!reject_texture.loadFromFile("../Data/Critter_crossing/UI/reject_button.png"))
+		{
+			std::cout << "Couldnt load accept button\n";
+
+		}
 		return all_ok;
 }
 
@@ -193,7 +202,7 @@ void Game::createSprites()
 	//open passport position & inspection zone
 	sf::FloatRect open_bounds = open_passport_sprite->getLocalBounds();
     open_passport_sprite->setOrigin(open_bounds.width / 2.0f, open_bounds.height / 2.0f);
-	open_passport_sprite->setPosition(window.getSize().x * 0.70f, window.getSize().y * 0.40f);
+	open_passport_sprite->setPosition(window.getSize().x * 0.70f, window.getSize().y * 0.45f);
 	open_passport_sprite->setScale(0.65f, 0.65f);
 	
 
@@ -214,6 +223,25 @@ void Game::createSprites()
 	desk_sprite.setScale(scale_x, scale_y);
 
 	desk_sprite.setPosition(0, window.getSize().y - desk_sprite.getGlobalBounds().height);
+
+	//Accept button
+	accept_sprite.setTexture(accept_texture);
+	accept_sprite.setScale(0.4f, 0.4f);
+
+	sf::FloatRect ab = accept_sprite.getLocalBounds();
+	accept_sprite.setOrigin(ab.width / 2.f, ab.height / 2.f);
+	
+	accept_sprite.setPosition(window.getSize().x * 0.78f, window.getSize().y * 0.88f);
+
+	//Reject button
+	reject_sprite.setTexture(reject_texture);
+	reject_sprite.setScale(0.4f, 0.4f);
+
+	sf::FloatRect rb = reject_sprite.getLocalBounds();
+	reject_sprite.setOrigin(rb.width / 2.f, rb.height / 2.f);
+
+	reject_sprite.setPosition(window.getSize().x * 0.62f, window.getSize().y * 0.88f);
+
 
 }
 
@@ -258,6 +286,15 @@ void Game::newAnimal()
 	closed_passport_sprite->setColor(sf::Color(255, 255, 255, 255));
 	closed_passport_sprite->setPosition(closed_passport_home_position);
 
+}
+
+void Game::nextAnimal()
+{
+	passport_open = false;
+
+	closed_passport_sprite->setPosition(closed_passport_home_position);
+
+	newAnimal();
 }
 
 
@@ -306,10 +343,35 @@ void Game::update(float dt)
 			dragged_sprite->setPosition(mouse_f + drag_offset);
 
 		}
+
+		if (passport_open)
+		{
+			accept_hover = isMouseOverSprite(accept_sprite);
+			reject_hover = isMouseOverSprite(reject_sprite);
+
+			if (accept_hover)
+			{
+				accept_sprite.setColor(sf::Color(255, 255, 255, 255));
+
+			}
+			else
+			{
+				accept_sprite.setColor(sf::Color(200, 200, 200, 255));
+
+			}
+			if (reject_hover)
+			{
+				reject_sprite.setColor(sf::Color(255, 255, 255, 255));
+			}
+			else
+			{
+				reject_sprite.setColor(sf::Color(200, 200, 200, 255));
+
+			}
+		}
 	}
 	else if (current_state == GameState::EXIT)
 	{
-
 	}
 }
 
@@ -344,6 +406,9 @@ void Game::render()
 		{
 			zone_outline.setOutlineColor(sf::Color::Green);
 			window.draw(zone_outline);
+
+			window.draw(accept_sprite);
+			window.draw(reject_sprite);
 
 		}
 
@@ -407,6 +472,26 @@ void Game::mouseClicked(sf::Event event)
 
 		  drag_offset = dragged_sprite->getPosition() - mouse_f;
 	  }
+
+	  if (passport_open && isMouseOverSprite(accept_sprite))
+	  {
+
+		  if (passportMatchesAnimal())
+		  {
+			  std::cout << "you accepted the matching animal\n";
+		  }
+		  else
+		  {
+			  std::cout << " you accepted a mismacthed animal\n";
+		  }
+		  nextAnimal();
+	      return;
+	  }
+	  if (passport_open && isMouseOverSprite(reject_sprite))
+	  {
+		  std::cout << "Rejected!\n";
+		  return;
+	  }
   }
 }
 
@@ -423,7 +508,7 @@ void Game::mouseReleased(sf::Event event)
 				passport_open = true;
 				closed_passport_sprite->setColor(sf::Color(255, 255, 255, 0));
 
-				open_passport_sprite->setPosition(window.getSize().x * 0.7f, window.getSize().y * 0.40f);
+				open_passport_sprite->setPosition(window.getSize().x * 0.7f, window.getSize().y * 0.45f);
 
 				sf::FloatRect openbounds = open_passport_sprite->getGlobalBounds();
 
@@ -492,5 +577,9 @@ bool Game::isInInspectionZone(const sf::Sprite& sprite)
 
 	return passportBounds.intersects(sprite.getGlobalBounds());
 
+}
+bool Game::passportMatchesAnimal() const
+{
+	return current_animal_index == current_passport_index;
 }
 

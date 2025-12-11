@@ -50,9 +50,6 @@ class Game
   bool isMouseOverText(const sf::Text& text);
   bool isMouseOverSprite(const sf::Sprite& sprite);
 
-
-
-
   //Animals
   sf::Sprite* animal_sprite;
 
@@ -68,6 +65,16 @@ class Game
   //Passport textures
   sf::Texture closed_passport_texture;
   sf::Texture open_passport_texture;
+
+  //stamp textures
+  sf::Texture accept_texture;
+  sf::Texture reject_texture;
+
+  sf::Sprite accept_sprite;
+  sf::Sprite reject_sprite;
+
+  bool accept_hover = false;
+  bool reject_hover = false;
 
   int current_animal_index;
   int current_passport_index;
@@ -99,6 +106,10 @@ class Game
   void stopDragging();
 
   bool isInInspectionZone(const sf::Sprite& sprite);
+
+  //matching animals & passport
+  bool passportMatchesAnimal() const;
+  void nextAnimal();
 
 };
 

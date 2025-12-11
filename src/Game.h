@@ -72,7 +72,7 @@ class Game
   int current_animal_index;
   int current_passport_index;
   bool should_accept;
-  bool passport_open;
+  bool passport_open = false;
 
   sf::Vector2f closed_passport_home_position;
 

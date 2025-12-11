@@ -244,10 +244,11 @@ void Game::newAnimal()
 		window.getSize().y * 0.60f);
 
 	//passports turn
+	passport_photo_sprite->setTexture(animal_textures[current_passport_index], true);
+
 	sf::FloatRect photo_bounds = passport_photo_sprite->getLocalBounds();
 	passport_photo_sprite->setOrigin(photo_bounds.width / 2.0f, photo_bounds.height / 2.0f);
-
-	passport_photo_sprite->setScale(0.6f, 0.6f);
+    passport_photo_sprite->setScale(0.6f, 0.6f);
 
 	passport_open = false;
 
@@ -325,8 +326,24 @@ void Game::render()
 		if (animal_sprite)
 			window.draw(*animal_sprite);
 
-		if (closed_passport_sprite)
-			window.draw(*closed_passport_sprite);
+		if (!passport_open)
+		{
+			if (closed_passport_sprite)
+				window.draw(*closed_passport_sprite);
+		}
+		else
+		{
+			if (open_passport_sprite)
+			{
+				window.draw(*open_passport_sprite);
+			}
+			if (passport_photo_sprite)
+			{
+				window.draw(*passport_photo_sprite);
+			}
+		}
+
+		
         
 
 	}
@@ -377,6 +394,12 @@ void Game::mouseReleased(sf::Event event)
 			if (isInInspectionZone(*closed_passport_sprite))
 			{
 				std::cout << "passport dropped in zone\n";
+
+				passport_open = true;
+
+				open_passport_sprite->setPosition(window.getSize().x * 0.7f, window.getSize().x * 0.4f);
+
+				passport_photo_sprite->setPosition(window.getSize().x * 0.7f, window.getSize().y * 0.4f);
 			}
 			else
 			{

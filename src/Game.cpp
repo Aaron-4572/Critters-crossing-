@@ -368,6 +368,15 @@ void Game::mouseClicked(sf::Event event)
   }
 }
 
+void Game::mouseReleased(sf::Event event)
+{
+	if (event.mouseButton.button == sf::Mouse::Left)
+	{
+		dragging = false;
+		dragged_sprite = nullptr;
+	}
+}
+
 void Game::keyPressed(sf::Event event)
 {
 	if (current_state == GameState::PLAYING)

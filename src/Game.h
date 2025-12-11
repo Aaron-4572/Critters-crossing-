@@ -92,7 +92,7 @@ class Game
 
   void updateDragging();
 
-  void stopDraggin();
+  void stopDragging();
 
   bool isInInspectionZone(const sf::Sprite& sprite);
 

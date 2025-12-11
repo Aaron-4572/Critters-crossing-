@@ -51,7 +51,7 @@ Game::~Game()
 bool Game::init()
 {
 	//Setting background textures
-	if (!background_texture.loadFromFile("../Data/Critter Crossing Customs/background.jpg"))
+	if (!background_texture.loadFromFile("../Data/Critter_crossing/background.jpg"))
 	{
 		std::cout << "Could not load background image";
     }
@@ -149,13 +149,13 @@ bool Game::loadTextures()
 	loadAnimal(8, "../Data/Critter_crossing/Animals/chicken.png");
 
 	    //pasport
-		if (!closed_passport_texture.loadFromFile("..Data/Critter_crossing/Passports/closed_passport.png"))
+		if (!closed_passport_texture.loadFromFile("../Data/Critter_crossing/passports/closed_passport.png"))
 		{
 			std::cout << "couldnt load closed passport texture\n";
 			all_ok = false;
 	    }
 
-		if (!open_passport_texture.loadFromFile("..Data/Critter_crossing/Passports/open_passport.png"))
+		if (!open_passport_texture.loadFromFile("../Data/Critter_crossing/passports/open_passport.png"))
 		{
 			std::cout << "couldnt load open passport texture\n";
 			all_ok = false;
@@ -169,16 +169,74 @@ void Game::createSprites()
 	animal_sprite = new sf::Sprite();
     closed_passport_sprite = new sf::Sprite();
 	open_passport_sprite = new sf::Sprite();
-	closed_passport_sprite = new sf::Sprite();
+	passport_photo_sprite = new sf::Sprite();
 
+	//assigns textures
+	closed_passport_sprite->setTexture(closed_passport_texture, true);
+	//set positions 
+	sf::FloatRect closed_bounds = closed_passport_sprite->getLocalBounds();
+	closed_passport_sprite->setOrigin(closed_bounds.width / 2.0f, closed_bounds.height / 2.0f);
 
+	closed_passport_sprite->setPosition(closed_passport_home_position);
 
+	open_passport_sprite->setTexture(open_passport_texture, true);
+	sf::FloatRect open_bounds = open_passport_sprite->getLocalBounds();
+    open_passport_sprite->setOrigin(open_bounds.width / 2.0f, open_bounds.height / 2.0f);
+
+	//inspection zone
+	open_passport_sprite->setPosition(
+		window.getSize().x * 0.70f,
+		window.getSize().y * 0.45f);
+
+	sf::FloatRect dummy_animal_bounds = animal_sprite->getLocalBounds();
+	animal_sprite->setOrigin(dummy_animal_bounds.width / 2.0f, dummy_animal_bounds.height / 2.0f);
+
+	animal_sprite->setPosition(window.getSize().x * 0.20f, window.getSize().y * 0.60f);
+
+	sf::FloatRect dummy_photo_bounds = closed_passport_sprite->getLocalBounds();
+	passport_photo_sprite->setOrigin(dummy_photo_bounds.width / 2.0f, dummy_photo_bounds.height / 2.0f);
 
 }
 
 
+void Game::newAnimal()
+{
+	if (animal_textures.empty())
+	{
+		std::cout << "Warning: animal_textures is empty, cannot generate new animal.\n";
+		return;
+	}
 
+	//generating randoms for animal and passport photo
+	current_animal_index = std::rand() % animal_textures.size();
+	current_passport_index = std::rand() % animal_textures.size();
 
+	should_accept = (current_animal_index == current_passport_index);
+
+	//setting said produces
+    animal_sprite->setTexture(animal_textures[current_animal_index], true);
+
+	//Re-centering
+	sf::FloatRect animal_bounds = animal_sprite->getLocalBounds();
+	animal_sprite->setOrigin(animal_bounds.width / 2.0f,
+		animal_bounds.height / 2.0f);
+
+	//Positioning
+	animal_sprite->setPosition(
+		window.getSize().x * 0.20f,
+		window.getSize().y * 0.60f);
+
+	//passports turn
+	sf::FloatRect photo_bounds = passport_photo_sprite->getLocalBounds();
+	passport_photo_sprite->setOrigin(photo_bounds.width / 2.0f, photo_bounds.height / 2.0f);
+
+	passport_photo_sprite->setScale(0.6f, 0.6f);
+
+	passport_open = false;
+
+	closed_passport_sprite->setPosition(closed_passport_home_position);
+
+}
 
 
 void Game::update(float dt)
@@ -228,17 +286,8 @@ void Game::render()
 	}
 	else if(current_state == GameState::PLAYING)
 	{
-		sf::Text debugging;
-		debugging.setFont(ui_font);
-	    debugging.setString("Game is running in playing state");
-        debugging.setCharacterSize(32);
-		debugging.setFillColor(sf::Color::White);
-
-		sf::FloatRect bounds = debugging.getLocalBounds();
-		debugging.setOrigin(bounds.width / 2.0f, bounds.height / 2.0f);
-		debugging.setPosition(window.getSize().x / 2.0f, window.getSize().y / 2.0f);
-
-		window.draw(debugging);
+		if (animal_sprite)
+			window.draw(*animal_sprite);
 
 	}
 }
@@ -276,18 +325,18 @@ void Game::keyPressed(sf::Event event)
 	{
 		if (event.key.code == sf::Keyboard::Escape)
 		{
-			current_state == GameState::MENU;
+			current_state = GameState::MENU;
 		}
 	}
 	else if (current_state == GameState::MENU)
 	{
 		if (event.key.code == sf::Keyboard::Enter)
 		{
-			current_state == GameState::PLAYING;
+			current_state = GameState::PLAYING;
 		}
 		else if (event.key.code == sf::Keyboard::Enter)
 		{
-			current_state == GameState::EXIT;
+			current_state = GameState::EXIT;
 		}
 	}
 }

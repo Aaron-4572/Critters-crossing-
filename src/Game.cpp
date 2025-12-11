@@ -291,6 +291,8 @@ void Game::newAnimal()
 void Game::nextAnimal()
 {
 	passport_open = false;
+	dragging = false;
+	dragged_sprite = nullptr;
 
 	closed_passport_sprite->setPosition(closed_passport_home_position);
 
@@ -464,34 +466,56 @@ void Game::mouseClicked(sf::Event event)
   {
 	  if (event.mouseButton.button == sf::Mouse::Left)
 	  {
-		  dragging = true;
-		  dragged_sprite = closed_passport_sprite;
 
 		  sf::Vector2i mouse = sf::Mouse::getPosition(window);
 		  sf::Vector2f mouse_f(static_cast<float>(mouse.x), static_cast<float>(mouse.y));
 
-		  drag_offset = dragged_sprite->getPosition() - mouse_f;
+		  
+
+		  if (!passport_open && isMouseOverSprite(*closed_passport_sprite))
+		  {
+			  dragging = true;
+			  dragged_sprite = closed_passport_sprite;
+			  drag_offset = dragged_sprite->getPosition() - mouse_f;
+			  return;
+		  }
+
+		  if (passport_open && isMouseOverSprite(accept_sprite))
+		  {
+
+			  if (passportMatchesAnimal())
+			  {
+				  std::cout << "you accepted a real passport\n";
+			  }
+			  else
+			  {
+				  std::cout << " you accepted a fake passport\n";
+				  
+			  }
+
+			  nextAnimal();
+			  return;
+
+		  }
+		  if (passport_open && isMouseOverSprite(reject_sprite))
+		  {
+			  if (!passportMatchesAnimal())
+			  {
+				  std::cout << "You rejectd a fake passport\n";
+			  }
+			  else
+			  {
+				  std::cout << " you rejected a real passport\n";
+				  
+
+			  }
+
+			  nextAnimal();
+			  return;
+		  }
 	  }
 
-	  if (passport_open && isMouseOverSprite(accept_sprite))
-	  {
-
-		  if (passportMatchesAnimal())
-		  {
-			  std::cout << "you accepted the matching animal\n";
-		  }
-		  else
-		  {
-			  std::cout << " you accepted a mismacthed animal\n";
-		  }
-		  nextAnimal();
-	      return;
-	  }
-	  if (passport_open && isMouseOverSprite(reject_sprite))
-	  {
-		  std::cout << "Rejected!\n";
-		  return;
-	  }
+	  
   }
 }
 

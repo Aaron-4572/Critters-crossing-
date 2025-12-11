@@ -193,7 +193,9 @@ void Game::createSprites()
 	//open passport position & inspection zone
 	sf::FloatRect open_bounds = open_passport_sprite->getLocalBounds();
     open_passport_sprite->setOrigin(open_bounds.width / 2.0f, open_bounds.height / 2.0f);
-	open_passport_sprite->setPosition(window.getSize().x * 0.70f, window.getSize().y * 0.45f);
+	open_passport_sprite->setPosition(window.getSize().x * 0.70f, window.getSize().y * 0.40f);
+	open_passport_sprite->setScale(0.65f, 0.65f);
+	
 
 	sf::FloatRect dummy_animal_bounds = animal_sprite->getLocalBounds();
 	animal_sprite->setOrigin(dummy_animal_bounds.width / 2.0f, dummy_animal_bounds.height / 2.0f);
@@ -248,10 +250,12 @@ void Game::newAnimal()
 
 	sf::FloatRect photo_bounds = passport_photo_sprite->getLocalBounds();
 	passport_photo_sprite->setOrigin(photo_bounds.width / 2.0f, photo_bounds.height / 2.0f);
-    passport_photo_sprite->setScale(0.6f, 0.6f);
+    passport_photo_sprite->setScale(0.55f, 0.55f);
 
 	passport_open = false;
 
+	//Resets the closed passport for a new round
+	closed_passport_sprite->setColor(sf::Color(255, 255, 255, 255));
 	closed_passport_sprite->setPosition(closed_passport_home_position);
 
 }
@@ -323,6 +327,26 @@ void Game::render()
 	{
 		window.draw(desk_sprite);
 
+		//Inspection zone outline
+		sf::FloatRect openbounds = open_passport_sprite->getGlobalBounds();
+
+		sf::RectangleShape zone_outline;
+		zone_outline.setPosition(openbounds.left, openbounds.top);
+		zone_outline.setSize(sf::Vector2f(openbounds.width, openbounds.height));
+
+		zone_outline.setFillColor(sf::Color(0, 0, 0, 0));  
+		zone_outline.setOutlineColor(sf::Color::Red);
+		zone_outline.setOutlineThickness(3.f);
+
+		window.draw(zone_outline);
+
+		if (passport_open == true)
+		{
+			zone_outline.setOutlineColor(sf::Color::Green);
+			window.draw(zone_outline);
+
+		}
+
 		if (animal_sprite)
 			window.draw(*animal_sprite);
 
@@ -336,6 +360,7 @@ void Game::render()
 			if (open_passport_sprite)
 			{
 				window.draw(*open_passport_sprite);
+				
 			}
 			if (passport_photo_sprite)
 			{
@@ -396,10 +421,18 @@ void Game::mouseReleased(sf::Event event)
 				std::cout << "passport dropped in zone\n";
 
 				passport_open = true;
+				closed_passport_sprite->setColor(sf::Color(255, 255, 255, 0));
 
-				open_passport_sprite->setPosition(window.getSize().x * 0.7f, window.getSize().x * 0.4f);
+				open_passport_sprite->setPosition(window.getSize().x * 0.7f, window.getSize().y * 0.40f);
 
-				passport_photo_sprite->setPosition(window.getSize().x * 0.7f, window.getSize().y * 0.4f);
+				sf::FloatRect openbounds = open_passport_sprite->getGlobalBounds();
+
+				sf::Vector2f photopos;
+				photopos.x = openbounds.left + openbounds.width * 0.195f;
+				photopos.y = openbounds.top + openbounds.height * 0.67f;
+
+				passport_photo_sprite->setPosition(photopos);
+
 			}
 			else
 			{
@@ -455,14 +488,9 @@ bool Game::isMouseOverSprite(const sf::Sprite& sprite)
 
 bool Game::isInInspectionZone(const sf::Sprite& sprite)
 {
-	float zone_x = window.getSize().x * 0.60f;
-	float zone_y = window.getSize().y - 250.f;
-	float zone_w = window.getSize().x * 0.35f;
-	float zone_h = 250.f;
+	sf::FloatRect passportBounds = open_passport_sprite->getGlobalBounds();
 
-	sf::FloatRect zone(zone_x, zone_y, zone_w, zone_h);
-
-	return zone.intersects(sprite.getGlobalBounds());
+	return passportBounds.intersects(sprite.getGlobalBounds());
 
 }
 

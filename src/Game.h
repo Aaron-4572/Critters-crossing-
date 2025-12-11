@@ -75,6 +75,7 @@ class Game
   bool passport_open = false;
 
   sf::Vector2f closed_passport_home_position;
+  sf::Vector2f photo_offset = sf::Vector2f(-50.f, -20.f);
 
   float inspection_zone_x;
 

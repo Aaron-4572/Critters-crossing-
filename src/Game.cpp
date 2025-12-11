@@ -169,12 +169,27 @@ bool Game::loadTextures()
 		if (!accept_texture.loadFromFile("../Data/Critter_crossing/UI/accept_button.png"))
 		{
 			std::cout << "Couldnt load accept button\n";
+			all_ok = false;
+
 
 		}
 		if (!reject_texture.loadFromFile("../Data/Critter_crossing/UI/reject_button.png"))
 		{
 			std::cout << "Couldnt load accept button\n";
+			all_ok = false;
 
+
+		}
+		if (!approved_stamp_texture.loadFromFile("../Data/Critter_crossing/UI/accept_stamp.png"))
+		{
+			std::cout << "accept stamp didnt load\n";
+			all_ok = false;
+
+		}
+		if (!denied_stamp_texture.loadFromFile("../Data/Critter_crossing/UI/reject_stamp.png"))
+		{
+			std::cout << "accept stamp didnt load\n";
+			all_ok = false;
 		}
 		return all_ok;
 }
@@ -241,6 +256,20 @@ void Game::createSprites()
 	reject_sprite.setOrigin(rb.width / 2.f, rb.height / 2.f);
 
 	reject_sprite.setPosition(window.getSize().x * 0.62f, window.getSize().y * 0.88f);
+
+	//Approved stamp
+	approved_stamp_sprite.setTexture(approved_stamp_texture);
+	approved_stamp_sprite.setScale(1.f, 1.f);
+
+	sf::FloatRect abounds = approved_stamp_sprite.getLocalBounds();
+	approved_stamp_sprite.setOrigin(abounds.width / 2.f, abounds.height / 2.f);
+
+	//Denied stamp
+	denied_stamp_sprite.setTexture(denied_stamp_texture);
+	denied_stamp_sprite.setScale(1.f, 1.f);
+
+	sf::FloatRect rbounds = denied_stamp_sprite.getLocalBounds();
+	denied_stamp_sprite.setOrigin(rbounds.width / 2.f, rbounds.height / 2.f);
 
 
 }
@@ -371,6 +400,49 @@ void Game::update(float dt)
 
 			}
 		}
+
+		if (stamping)
+		{
+			stamp_timer += dt;
+
+			float duration = 0.25;
+
+			sf::Vector2f passportpos = open_passport_sprite->getPosition();
+
+			float start_y = passportpos.y - 300.f;
+			float end_y = passportpos.y - 100.f;
+
+			float t = std::min(stamp_timer / duration, 1.0f);
+
+			float eased = 1 - pow(1 - t, 3);
+
+			float current_y = start_y + (end_y - start_y) * eased;
+
+			if (stamp_is_approved)
+			{
+				approved_stamp_sprite.setPosition(passportpos.x, current_y);
+			}
+			else
+			{
+				denied_stamp_sprite.setPosition(passportpos.x, current_y);
+			}
+
+			if (stamp_timer >= duration)
+			{
+				if (stamp_delay == 0.0f)
+					stamp_delay = 0.25f;
+
+				stamp_delay -= dt;
+
+				if (stamp_delay <= 0.0f)
+				{
+					stamping = false;
+					stamp_delay = 0.0f;
+					nextAnimal();
+				}
+				
+			}
+		}
 	}
 	else if (current_state == GameState::EXIT)
 	{
@@ -435,6 +507,18 @@ void Game::render()
 			}
 		}
 
+		if (stamping)
+		{
+			if (stamp_is_approved)
+			{
+				window.draw(approved_stamp_sprite);
+			}
+			else
+			{
+				window.draw(denied_stamp_sprite);
+			}
+		}
+
 		
         
 
@@ -482,8 +566,8 @@ void Game::mouseClicked(sf::Event event)
 
 		  if (passport_open && isMouseOverSprite(accept_sprite))
 		  {
-
-			  if (passportMatchesAnimal())
+			  bool correct = passportMatchesAnimal();
+			  if (correct)
 			  {
 				  std::cout << "you accepted a real passport\n";
 			  }
@@ -493,13 +577,18 @@ void Game::mouseClicked(sf::Event event)
 				  
 			  }
 
-			  nextAnimal();
+			  stamping = true;
+			  stamp_is_approved = true;
+			  stamp_timer = 0.0f;
+
 			  return;
 
 		  }
 		  if (passport_open && isMouseOverSprite(reject_sprite))
 		  {
-			  if (!passportMatchesAnimal())
+			  bool correct = !passportMatchesAnimal();
+
+			  if (correct)
 			  {
 				  std::cout << "You rejectd a fake passport\n";
 			  }
@@ -510,7 +599,10 @@ void Game::mouseClicked(sf::Event event)
 
 			  }
 
-			  nextAnimal();
+			  stamping = true;
+			  stamp_is_approved = false;
+			  stamp_timer = 0.0f;
+
 			  return;
 		  }
 	  }

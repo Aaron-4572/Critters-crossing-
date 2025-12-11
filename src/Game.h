@@ -76,6 +76,17 @@ class Game
   bool accept_hover = false;
   bool reject_hover = false;
 
+  sf::Texture approved_stamp_texture;
+  sf::Texture denied_stamp_texture;
+
+  sf::Sprite approved_stamp_sprite;
+  sf::Sprite denied_stamp_sprite;
+
+  bool stamping = false;
+  float stamp_timer = 0.0f;
+  bool stamp_is_approved = false;
+  float stamp_delay = 0.0f;
+
   int current_animal_index;
   int current_passport_index;
   bool should_accept;

@@ -89,12 +89,12 @@ void Game::setupMenu()
 	title_text.setFont(ui_font);
 	title_text.setString("Critters Crossing");
 	title_text.setCharacterSize(64);
-	title_text.setFillColor(sf::Color::White);
+	title_text.setFillColor(sf::Color::Magenta);
 
 	//setting titel location
 	sf::FloatRect title_bounds = title_text.getLocalBounds();
 	title_text.setOrigin(title_bounds.width / 2.0f, title_bounds.height / 2.0f);
-	title_text.setPosition(window.getSize().x / 2.0f, 120.0f);
+	title_text.setPosition(window.getSize().x / 2.0f, 200.0f);
 
 	//Start game text
 	start_text.setFont(ui_font);

@@ -111,25 +111,20 @@ class Game
 
   float inspection_zone_x;
 
+  //Textures
   bool loadTextures();
-
+  //Sprites
   void createSprites();
-
+  //Create new animal
   void newAnimal();
 
-  void openPassport();
 
   //For dragging 
   sf::Sprite* dragged_sprite;
   sf::Vector2f drag_offset;
   bool dragging = false;
 
-  void startDragging(sf::Sprite* sprite, const sf::Vector2f& mouse_pos);
-
-  void updateDragging();
-
-  void stopDragging();
-
+  //inspection zone
   bool isInInspectionZone(const sf::Sprite& sprite);
 
   //matching animals & passport
